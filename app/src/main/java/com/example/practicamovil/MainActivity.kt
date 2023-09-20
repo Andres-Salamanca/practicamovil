@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.button.setOnClickListener {
 
+
             val cameraPermissionGranted =
                 ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
             val storagePermissionGranted =
@@ -75,6 +76,15 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+
+        binding.button5.setOnClickListener{
+
+            acceactivitylocation();
+
+
+        }
+
+
     }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -108,5 +118,10 @@ class MainActivity : AppCompatActivity() {
     fun acceactivitycamera(){
         val pasarcaemra= Intent(this,CameraescogerActivity::class.java)
         startActivity(pasarcaemra)
+    }
+
+    fun acceactivitylocation(){
+        val pascarlocation= Intent(this,LocationActivity::class.java)
+        startActivity(pascarlocation)
     }
 }
