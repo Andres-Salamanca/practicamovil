@@ -4,16 +4,62 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.example.practicamovil.databinding.ActivityCameraescogerBinding
 import com.example.practicamovil.databinding.ActivityMainBinding
+import java.io.File
 
 class CameraescogerActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityCameraescogerBinding
+    private lateinit var camerapath:Uri
+    private val cameraRequest = registerForActivityResult(ActivityResultContracts.TakePicture()
+    ) { loadImage(camerapath) }
 
+    private val GalleryRequest = registerForActivityResult(ActivityResultContracts.GetContent()
+    ) { loadImage(camerapath) }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_cameraescoger)
+
+        binding = ActivityCameraescogerBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        initializeFile()
+
+        binding.button3.setOnClickListener{
+            cameraRequest.launch(camerapath)
+        }
+
+        binding.button4.setOnClickListener {
+            // Open gallery
+            GalleryRequest.launch("image/*")
+        }
+
+    }
+
+    fun initializeFile(){
+        var imagetoload = File(filesDir,"fileFromCamera")
+        camerapath = FileProvider.getUriForFile(this, applicationContext.packageName + ".fileprovider", imagetoload)
+
+    }
+    fun loadImage(imagepath:Uri?){
+
+        val imagestream = contentResolver.openInputStream(imagepath!!)
+        val image = BitmapFactory.decodeStream(imagestream)
+        binding.imageView2.setImageBitmap(image)
+
+    }
+/*
     private lateinit var binding: ActivityCameraescogerBinding
     private val CAMERA_STORAGE_PERMISSION = 102
 
@@ -60,5 +106,5 @@ class CameraescogerActivity : AppCompatActivity() {
         }
     }
 
-
+    */
 }
