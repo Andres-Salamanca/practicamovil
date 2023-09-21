@@ -11,12 +11,17 @@ import androidx.core.content.ContextCompat
 import com.example.practicamovil.databinding.ActivityLocationBinding
 import com.example.practicamovil.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 
 class LocationActivity : AppCompatActivity() {
 
     private lateinit var bindingLocation: ActivityLocationBinding
     private lateinit var mFusedLocationClient:FusedLocationProviderClient
+    private lateinit var mLocationRquest:LocationRequest
+    private lateinit var mLcationCallback: LocationCallback
 
     private val LOCATION_REQUEST_CODE = 1
 
@@ -29,6 +34,24 @@ class LocationActivity : AppCompatActivity() {
         val view = bindingLocation.root
         setContentView(view)
 
+        mLocationRquest = createLocationRequest()
+
+        mLcationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val location = locationResult.lastLocation
+                Log.i("LOCATIONes", "location update in the callback $location")
+                if (location != null) {
+                    bindingLocation.textView13.text = "123"
+                    bindingLocation.textView12.text = location.latitude.toString()
+                    bindingLocation.textView11.text = location.altitude.toString()
+                    Log.i("location", "latitude" +location.latitude)
+                }
+            }
+        }
+
+
+        startLocationUpdates()
+
         conseguirlugar()
 
         bindingLocation.button6.setOnClickListener{
@@ -36,7 +59,34 @@ class LocationActivity : AppCompatActivity() {
         }
 
 
+
+
     }
+
+    private fun createLocationRequest(): LocationRequest {
+        val locationRequest = LocationRequest.create()
+            .setInterval(5000) // 5 seconds
+            .setFastestInterval(5000) // 5 seconds
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        return locationRequest
+    }
+    private fun startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+            mFusedLocationClient.requestLocationUpdates(mLocationRquest, mLcationCallback, null)
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_REQUEST_CODE
+            )
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
